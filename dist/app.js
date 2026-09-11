@@ -28,7 +28,7 @@ let coverageCells = [];
 let coveredCells = 0;
 const coverageColumns = 22;
 const coverageRows = 9;
-const revealThreshold = 0.42;
+const revealThreshold = 0.62;
 
 if (invite) {
   document.title = `Hallo ${invite.giver} · Familienwichteln 2026`;
@@ -118,15 +118,17 @@ function startScratch(event) {
   isScratching = true;
   lastPoint = getCanvasPoint(event);
   scratchCanvas.setPointerCapture?.(event.pointerId);
-  scratchAt(lastPoint, lastPoint);
+  const shouldReveal = scratchAt(lastPoint, lastPoint);
+  if (shouldReveal) finishScratchAndReveal(event);
 }
 
 function continueScratch(event) {
   if (!isScratching || isRevealed) return;
   event.preventDefault();
   const point = getCanvasPoint(event);
-  scratchAt(lastPoint, point);
+  const shouldReveal = scratchAt(lastPoint, point);
   lastPoint = point;
+  if (shouldReveal) finishScratchAndReveal(event);
 }
 
 function stopScratch(event) {
@@ -136,6 +138,13 @@ function stopScratch(event) {
   if (event?.pointerId !== undefined && scratchCanvas.hasPointerCapture?.(event.pointerId)) {
     scratchCanvas.releasePointerCapture(event.pointerId);
   }
+}
+
+function finishScratchAndReveal(event) {
+  // iOS Safari can flicker when a transformed canvas still owns the active
+  // pointer. End the gesture first, then start the reveal animation.
+  stopScratch(event);
+  requestAnimationFrame(() => showResult({ celebrate: true }));
 }
 
 function scratchAt(from, to) {
@@ -153,7 +162,7 @@ function scratchAt(from, to) {
   scratchContext.stroke();
   scratchContext.restore();
 
-  markCoverage(from, to, brushSize / 2, bounds);
+  return markCoverage(from, to, brushSize / 2, bounds);
 }
 
 function markCoverage(from, to, radius, bounds) {
@@ -184,7 +193,7 @@ function markCoverage(from, to, radius, bounds) {
   if (coverage > 0.16 && coverage < revealThreshold) {
     scratchHelp.querySelector("span:last-child").textContent = "Weiter so – gleich ist es so weit";
   }
-  if (coverage >= revealThreshold) showResult({ celebrate: true });
+  return coverage >= revealThreshold;
 }
 
 function handleScratchKey(event) {
@@ -210,6 +219,14 @@ function showResult({ celebrate, remembered = false }) {
 
   if (!remembered) writeRevealState();
   if (celebrate) launchConfetti();
+
+  if (remembered) {
+    scratchCanvas.hidden = true;
+  } else {
+    window.setTimeout(() => {
+      scratchCanvas.hidden = true;
+    }, 850);
+  }
 }
 
 function storageKey() {
@@ -248,7 +265,7 @@ function launchConfetti() {
   const colors = ["#f8d98d", "#fff4ce", "#a92e42", "#2c7a60", "#d6a53e"];
   const fragment = document.createDocumentFragment();
 
-  for (let index = 0; index < 48; index += 1) {
+  for (let index = 0; index < 36; index += 1) {
     const piece = document.createElement("i");
     piece.style.setProperty("--x", `${38 + Math.random() * 24}vw`);
     piece.style.setProperty("--dx", `${-180 + Math.random() * 360}px`);
@@ -267,7 +284,9 @@ function createSnow() {
   const container = document.querySelector("#snow");
   const fragment = document.createDocumentFragment();
 
-  for (let index = 0; index < 32; index += 1) {
+  const snowflakeCount = window.matchMedia("(max-width: 600px)").matches ? 20 : 32;
+
+  for (let index = 0; index < snowflakeCount; index += 1) {
     const flake = document.createElement("i");
     flake.style.setProperty("--x", `${Math.random() * 100}vw`);
     flake.style.setProperty("--size", `${2 + Math.random() * 4}px`);

@@ -128,6 +128,7 @@ canvas {
   box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   isolation: isolate;
   backdrop-filter: blur(24px) saturate(125%);
+  -webkit-backdrop-filter: blur(24px) saturate(125%);
   opacity: 0;
   transform: translateY(14px) scale(0.985);
   transition: opacity 800ms ease, transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -290,7 +291,11 @@ h1 {
   height: 100%;
   cursor: grab;
   touch-action: none;
-  transition: opacity 850ms ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1), filter 850ms ease;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: opacity, transform;
+  transition: opacity 700ms ease, transform 850ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 #scratchCanvas:active {
@@ -318,8 +323,7 @@ h1 {
 
 .scratch-stage.is-revealed #scratchCanvas {
   opacity: 0;
-  transform: scale(1.06);
-  filter: blur(8px);
+  transform: translate3d(0, 0, 0) scale(1.035);
   cursor: default;
 }
 
@@ -347,8 +351,9 @@ h1 {
   height: 13px;
   border-radius: 2px;
   background: var(--color);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--color) 45%, transparent);
   opacity: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   animation: confetti-burst var(--duration) var(--delay) cubic-bezier(0.12, 0.75, 0.3, 1) forwards;
 }
 
@@ -433,6 +438,10 @@ h1 {
 }
 
 @media (max-width: 520px) {
+  .grain {
+    display: none;
+  }
+
   .app-shell {
     padding: 0;
   }
@@ -441,6 +450,9 @@ h1 {
     min-height: 100svh;
     border: 0;
     border-radius: 0;
+    background: rgba(6, 29, 23, 0.94);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .invitation__rim {
