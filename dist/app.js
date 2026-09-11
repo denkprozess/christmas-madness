@@ -33,13 +33,13 @@ const revealThreshold = 0.62;
 if (invite) {
   document.title = `Hallo ${invite.giver} · Familienwichteln 2026`;
   greeting.textContent = `Hallo, ${invite.giver}.`;
-  intro.textContent = "Dein Weihnachtslos liegt bereit. Dahinter wartet der Name der Person, die du dieses Jahr beschenkst.";
+  intro.textContent = "Dein Los liegt bereit. Dahinter wartet der Name der Person, die du beschenken darfst.";
   document.querySelector("#recipient").textContent = invite.recipient;
   scratchStage.hidden = false;
   const wasAlreadyRevealed = readRevealState();
 
   if (wasAlreadyRevealed) {
-    intro.textContent = "Schön, dass du wieder da bist. Dein Weihnachtslos ist bereits geöffnet.";
+    intro.textContent = "Schön, dass du wieder da bist. Dein Los ist bereits geöffnet.";
     showResult({ celebrate: false, remembered: true });
   } else {
     requestAnimationFrame(prepareScratchCover);
@@ -60,30 +60,95 @@ function prepareScratchCover() {
 
   scratchContext = scratchCanvas.getContext("2d", { willReadFrequently: false });
   scratchContext.scale(canvasScale, canvasScale);
-  const gradient = scratchContext.createLinearGradient(0, 0, bounds.width, bounds.height);
-  gradient.addColorStop(0, "#b48531");
-  gradient.addColorStop(0.45, "#f8da8a");
-  gradient.addColorStop(0.72, "#c99b42");
-  gradient.addColorStop(1, "#8c6726");
-  scratchContext.fillStyle = gradient;
+  const foil = scratchContext.createLinearGradient(0, 0, bounds.width, bounds.height);
+  foil.addColorStop(0, "#8f6726");
+  foil.addColorStop(0.16, "#d4ab57");
+  foil.addColorStop(0.34, "#fff0b7");
+  foil.addColorStop(0.5, "#c7973e");
+  foil.addColorStop(0.69, "#f8d987");
+  foil.addColorStop(0.86, "#b37f2d");
+  foil.addColorStop(1, "#7c561d");
+  scratchContext.fillStyle = foil;
   scratchContext.fillRect(0, 0, bounds.width, bounds.height);
 
-  const shine = scratchContext.createLinearGradient(0, 0, bounds.width, 0);
-  shine.addColorStop(0, "rgba(255,255,255,0)");
-  shine.addColorStop(0.46, "rgba(255,255,255,.22)");
-  shine.addColorStop(0.54, "rgba(255,255,255,.05)");
-  shine.addColorStop(1, "rgba(255,255,255,0)");
-  scratchContext.fillStyle = shine;
+  // Static iridescent bands create a holographic look without adding an
+  // animation workload while the user scratches on iOS.
+  const hologram = scratchContext.createLinearGradient(0, bounds.height, bounds.width, 0);
+  hologram.addColorStop(0, "rgba(101, 220, 255, 0)");
+  hologram.addColorStop(0.18, "rgba(101, 220, 255, .15)");
+  hologram.addColorStop(0.34, "rgba(232, 139, 255, .13)");
+  hologram.addColorStop(0.5, "rgba(255, 246, 176, .03)");
+  hologram.addColorStop(0.66, "rgba(111, 255, 192, .14)");
+  hologram.addColorStop(0.82, "rgba(255, 151, 183, .12)");
+  hologram.addColorStop(1, "rgba(255, 151, 183, 0)");
+  scratchContext.save();
+  scratchContext.globalCompositeOperation = "screen";
+  scratchContext.fillStyle = hologram;
   scratchContext.fillRect(0, 0, bounds.width, bounds.height);
+  scratchContext.restore();
+
+  // Fine security waves and repeating seasonal watermarks make the foil feel
+  // like a premium printed scratch card rather than a flat color layer.
+  scratchContext.save();
+  scratchContext.strokeStyle = "rgba(255, 247, 211, .18)";
+  scratchContext.lineWidth = 0.7;
+  for (let y = 9; y < bounds.height; y += 15) {
+    scratchContext.beginPath();
+    for (let x = 0; x <= bounds.width; x += 7) {
+      const waveY = y + Math.sin(x * 0.055 + y * 0.08) * 2.8;
+      if (x === 0) scratchContext.moveTo(x, waveY);
+      else scratchContext.lineTo(x, waveY);
+    }
+    scratchContext.stroke();
+  }
+  scratchContext.restore();
 
   scratchContext.save();
-  scratchContext.globalAlpha = 0.14;
-  for (let index = 0; index < 520; index += 1) {
-    const size = Math.random() * 1.8 + 0.3;
+  scratchContext.translate(bounds.width / 2, bounds.height / 2);
+  scratchContext.rotate(-0.13);
+  scratchContext.textAlign = "center";
+  scratchContext.textBaseline = "middle";
+  for (let row = -3; row <= 3; row += 1) {
+    for (let column = -4; column <= 4; column += 1) {
+      const x = column * 72 + (row % 2 === 0 ? 0 : 36);
+      const y = row * 43;
+      const isSnowflake = (row + column) % 2 === 0;
+      scratchContext.fillStyle = isSnowflake
+        ? "rgba(72, 47, 12, .19)"
+        : "rgba(255, 250, 226, .19)";
+      scratchContext.font = isSnowflake
+        ? "400 18px Georgia, serif"
+        : "700 10px Inter, system-ui, sans-serif";
+      scratchContext.fillText(isSnowflake ? "❄︎" : "✦ 2026", x, y);
+    }
+  }
+  scratchContext.restore();
+
+  scratchContext.save();
+  scratchContext.globalAlpha = 0.13;
+  for (let index = 0; index < 430; index += 1) {
+    const size = Math.random() * 1.5 + 0.25;
     scratchContext.fillStyle = Math.random() > 0.48 ? "#fff6d3" : "#52380f";
     scratchContext.fillRect(Math.random() * bounds.width, Math.random() * bounds.height, size, size);
   }
   scratchContext.restore();
+
+  scratchContext.strokeStyle = "rgba(255, 245, 205, .4)";
+  scratchContext.lineWidth = 1;
+  scratchContext.strokeRect(8.5, 8.5, bounds.width - 17, bounds.height - 17);
+
+  const labelBand = scratchContext.createLinearGradient(
+    bounds.width * 0.25,
+    0,
+    bounds.width * 0.75,
+    0,
+  );
+  labelBand.addColorStop(0, "rgba(70, 43, 9, 0)");
+  labelBand.addColorStop(0.24, "rgba(70, 43, 9, .13)");
+  labelBand.addColorStop(0.76, "rgba(70, 43, 9, .13)");
+  labelBand.addColorStop(1, "rgba(70, 43, 9, 0)");
+  scratchContext.fillStyle = labelBand;
+  scratchContext.fillRect(bounds.width * 0.2, bounds.height / 2 - 31, bounds.width * 0.6, 62);
 
   scratchContext.fillStyle = "rgba(69, 39, 7, .82)";
   scratchContext.textAlign = "center";
@@ -93,7 +158,7 @@ function prepareScratchCover() {
   scratchContext.fillText("FREIRUBBELN", bounds.width / 2, bounds.height / 2 - 7);
   scratchContext.fillStyle = "rgba(69, 39, 7, .58)";
   scratchContext.font = "500 11px Inter, system-ui, sans-serif";
-  scratchContext.fillText("✦  ✦  ✦", bounds.width / 2, bounds.height / 2 + 22);
+  scratchContext.fillText("✦  WEIHNACHTEN  ✦", bounds.width / 2, bounds.height / 2 + 22);
 
   coverageCells = Array.from({ length: coverageColumns * coverageRows }, () => false);
   scratchCanvas.addEventListener("pointerdown", startScratch);
