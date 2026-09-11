@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#071915" />
+    <meta
+      name="description"
+      content="Dein persönliches Los für das Familienwichteln 2026."
+    />
+    <title>Familienwichteln 2026</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23071915'/%3E%3Cpath d='M32 9 37 24 53 24 40 33 45 49 32 39 19 49 24 33 11 24 27 24Z' fill='%23f4c66e'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true">
+      <div class="aurora aurora--one"></div>
+      <div class="aurora aurora--two"></div>
+      <div class="grain"></div>
+      <div class="snow" id="snow"></div>
+    </div>
+
+    <main class="app-shell">
+      <section class="invitation" id="invitation" aria-live="polite">
+        <div class="invitation__rim" aria-hidden="true"></div>
+
+        <div class="invitation__content">
+          <div class="crest" aria-hidden="true">
+            <span></span>
+            <span class="crest__star">✦</span>
+            <span></span>
+          </div>
+
+          <p class="eyebrow">Familienwichteln · Weihnachten 2026</p>
+          <h1 id="greeting">Einen Moment&nbsp;…</h1>
+          <p class="intro" id="intro">
+            Dein persönliches Weihnachtslos wird vorbereitet.
+          </p>
+
+          <div class="scratch-stage" id="scratchStage" hidden>
+            <div class="reveal-card">
+              <div class="reveal-card__glow" aria-hidden="true"></div>
+              <p aria-hidden="true">Du beschenkst</p>
+              <strong id="recipient" aria-hidden="true"></strong>
+              <span aria-hidden="true">Bitte behalte es noch für dich.</span>
+              <canvas
+                id="scratchCanvas"
+                tabindex="0"
+                aria-label="Goldene Fläche freirubbeln. Mit Eingabetaste direkt aufdecken."
+              ></canvas>
+            </div>
+            <p class="sr-only" id="resultAnnouncement" aria-live="assertive"></p>
+
+            <div class="scratch-help" id="scratchHelp">
+              <span class="scratch-help__gesture" aria-hidden="true">✦</span>
+              <span>Mit dem Finger oder der Maus freirubbeln</span>
+            </div>
+          </div>
+
+          <div class="invalid-state" id="invalidState" hidden>
+            <span aria-hidden="true">🎁</span>
+            <p>Dieser Einladungslink ist leider nicht vollständig.</p>
+            <small>Bitte öffne genau den Link, den du erhalten hast.</small>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
