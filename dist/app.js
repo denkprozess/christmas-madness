@@ -207,7 +207,6 @@ function showResult({ celebrate, remembered = false }) {
   if (isRevealed) return;
   isRevealed = true;
   stopScratch();
-  scratchStage.classList.add("is-revealed");
   scratchCanvas.setAttribute("aria-hidden", "true");
   scratchCanvas.tabIndex = -1;
   document.querySelectorAll(".reveal-card > p, .reveal-card > strong, .reveal-card > span")
@@ -218,14 +217,23 @@ function showResult({ celebrate, remembered = false }) {
     : '<span class="scratch-help__gesture" aria-hidden="true">✦</span><span>Dein Wichtel wurde enthüllt</span>';
 
   if (!remembered) writeRevealState();
-  if (celebrate) launchConfetti();
 
   if (remembered) {
     scratchCanvas.hidden = true;
+    scratchStage.classList.add("is-revealed");
   } else {
-    window.setTimeout(() => {
-      scratchCanvas.hidden = true;
-    }, 850);
+    // A heavily scratched canvas is expensive for iOS Safari to composite.
+    // Remove it before starting any celebration animations so Safari cannot
+    // skip their first frames while uploading the canvas texture.
+    scratchCanvas.hidden = true;
+    document.body.classList.add("is-celebrating");
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scratchStage.classList.add("is-revealed");
+        if (celebrate) launchConfetti();
+      });
+    });
   }
 }
 
@@ -260,12 +268,16 @@ function writeRevealState() {
 }
 
 function launchConfetti() {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.body.classList.remove("is-celebrating");
+    return;
+  }
   const container = document.querySelector("#confetti");
   const colors = ["#f8d98d", "#fff4ce", "#a92e42", "#2c7a60", "#d6a53e"];
   const fragment = document.createDocumentFragment();
+  const pieceCount = window.matchMedia("(max-width: 600px)").matches ? 22 : 36;
 
-  for (let index = 0; index < 36; index += 1) {
+  for (let index = 0; index < pieceCount; index += 1) {
     const piece = document.createElement("i");
     piece.style.setProperty("--x", `${38 + Math.random() * 24}vw`);
     piece.style.setProperty("--dx", `${-180 + Math.random() * 360}px`);
@@ -276,8 +288,17 @@ function launchConfetti() {
     fragment.append(piece);
   }
 
+  container.classList.remove("is-active");
   container.replaceChildren(fragment);
-  window.setTimeout(() => container.replaceChildren(), 2600);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => container.classList.add("is-active"));
+  });
+
+  window.setTimeout(() => {
+    container.classList.remove("is-active");
+    container.replaceChildren();
+    document.body.classList.remove("is-celebrating");
+  }, 2800);
 }
 
 function createSnow() {

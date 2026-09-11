@@ -258,6 +258,9 @@ h1 {
 .reveal-card strong {
   position: relative;
   z-index: 1;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  will-change: opacity, transform;
 }
 
 .reveal-card p {
@@ -328,11 +331,19 @@ h1 {
 }
 
 .scratch-stage.is-revealed .reveal-card {
-  animation: reveal-card 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: reveal-card 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.scratch-stage.is-revealed .reveal-card p {
+  animation: reveal-copy 520ms 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .scratch-stage.is-revealed .reveal-card strong {
-  animation: reveal-name 900ms 120ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: reveal-name 760ms 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.scratch-stage.is-revealed .reveal-card span {
+  animation: reveal-copy 560ms 290ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .confetti {
@@ -354,7 +365,14 @@ h1 {
   opacity: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+.confetti.is-active i {
   animation: confetti-burst var(--duration) var(--delay) cubic-bezier(0.12, 0.75, 0.3, 1) forwards;
+}
+
+body.is-celebrating .snow i {
+  animation-play-state: paused;
 }
 
 .invalid-state {
@@ -408,18 +426,35 @@ h1 {
 
 @keyframes reveal-card {
   0% {
-    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform: translate3d(0, 0, 0) scale(0.985);
   }
-  45% {
-    box-shadow: 0 28px 78px rgba(211, 167, 72, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  55% {
+    transform: translate3d(0, 0, 0) scale(1.012);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
 @keyframes reveal-name {
   from {
-    opacity: 0.35;
-    transform: translateY(8px) scale(0.94);
-    filter: blur(5px);
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes reveal-copy {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -438,7 +473,9 @@ h1 {
 }
 
 @media (max-width: 520px) {
-  .grain {
+  .grain,
+  .aurora,
+  .reveal-card__glow {
     display: none;
   }
 
@@ -472,6 +509,9 @@ h1 {
   .reveal-card {
     min-height: 11.2rem;
     border-radius: 1.3rem;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 }
 
