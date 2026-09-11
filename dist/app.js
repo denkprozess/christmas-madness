@@ -155,10 +155,7 @@ function prepareScratchCover() {
   scratchContext.textBaseline = "middle";
   scratchContext.font = "700 13px Inter, system-ui, sans-serif";
   scratchContext.letterSpacing = "3px";
-  scratchContext.fillText("FREIRUBBELN", bounds.width / 2, bounds.height / 2 - 7);
-  scratchContext.fillStyle = "rgba(69, 39, 7, .58)";
-  scratchContext.font = "500 11px Inter, system-ui, sans-serif";
-  scratchContext.fillText("✦  WEIHNACHTEN  ✦", bounds.width / 2, bounds.height / 2 + 22);
+  scratchContext.fillText("FREIRUBBELN", bounds.width / 2, bounds.height / 2);
 
   coverageCells = Array.from({ length: coverageColumns * coverageRows }, () => false);
   scratchCanvas.addEventListener("pointerdown", startScratch);
@@ -290,11 +287,13 @@ function showResult({ celebrate, remembered = false }) {
     // A heavily scratched canvas is expensive for iOS Safari to composite.
     // Remove it before starting any celebration animations so Safari cannot
     // skip their first frames while uploading the canvas texture.
+    scratchStage.classList.add("is-preparing-reveal");
     scratchCanvas.hidden = true;
     document.body.classList.add("is-celebrating");
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
+        scratchStage.classList.remove("is-preparing-reveal");
         scratchStage.classList.add("is-revealed");
         if (celebrate) launchConfetti();
       });

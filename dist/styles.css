@@ -258,9 +258,8 @@ h1 {
 .reveal-card strong {
   position: relative;
   z-index: 1;
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  will-change: opacity, transform;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 .reveal-card p {
@@ -328,6 +327,22 @@ h1 {
   opacity: 0;
   transform: translate3d(0, 0, 0) scale(1.035);
   cursor: default;
+}
+
+.scratch-stage.is-preparing-reveal .reveal-card p,
+.scratch-stage.is-preparing-reveal .reveal-card span,
+.scratch-stage.is-preparing-reveal .reveal-card strong {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+}
+
+.scratch-stage.is-preparing-reveal .reveal-card p,
+.scratch-stage.is-preparing-reveal .reveal-card span,
+.scratch-stage.is-preparing-reveal .reveal-card strong,
+.scratch-stage.is-revealed .reveal-card p,
+.scratch-stage.is-revealed .reveal-card span,
+.scratch-stage.is-revealed .reveal-card strong {
+  will-change: opacity, transform;
 }
 
 .scratch-stage.is-revealed .reveal-card {
